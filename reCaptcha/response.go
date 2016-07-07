@@ -11,21 +11,9 @@ const APIURL = "https://www.google.com/recaptcha/api/siteverify"
 
 
 type Response struct {
-	success bool
-	challenge_ts string
-	hostname string
-}
-
-func (this Response) Success() bool {
-	return this.success
-}
-
-func (this Response) Challenge_ts() string {
-	return this.challenge_ts
-}
-
-func (this Response) Hostname() string {
-	return this.hostname
+	Success bool
+	Challenge_ts string
+	Hostname string
 }
 
 /*
@@ -59,13 +47,13 @@ func Get(captcha, secretKey string) (res *Response, err error) {
 	    	case string:
 	        	switch k {
 	        		case "challenge_ts":
-	        			res.challenge_ts = v.(string)
+	        			res.Challenge_ts = v.(string)
 	        		
 	        		case "hostname":
-	        			res.hostname = v.(string)
+	        			res.Hostname = v.(string)
 	        	}
 	    	case bool:
-	    		res.success = v.(bool)
+	    		res.Success = v.(bool)
 
 	    	case []interface{}:
 		       for _, u := range vv {
