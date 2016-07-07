@@ -16,6 +16,18 @@ type Response struct {
 	hostname string
 }
 
+func (this Response) Success() bool {
+	return this.success
+}
+
+func (this Response) Challenge_ts() string {
+	return this.challenge_ts
+}
+
+func (this Response) Hostname() string {
+	return this.hostname
+}
+
 /*
 	send the captcha js response to the google's api
 	format with the above struct the response and send
@@ -39,9 +51,9 @@ func Get(captcha, secretKey string) (res *Response, err error) {
 		
 	}
 	verify := i.(map[string]interface{})
+	var errCodes string
 	var resp Response
 	res = &resp
-	var errCodes string
 	for k, v := range verify {
     	switch vv := v.(type) {
 	    	case string:
