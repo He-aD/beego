@@ -3,7 +3,6 @@ package reCaptcha
 import (
 	"github.com/astaxie/beego/httplib"
 	"encoding/json"
-	"errors"
 )
 
 const NBERRORS = 4 //flag the number of google's error codes
@@ -14,6 +13,15 @@ type Response struct {
 	Success bool
 	Challenge_ts string
 	Hostname string
+}
+
+type ErrorCaptcha struct {
+	code string
+	description string
+}
+
+func (e *ErrorCaptcha) Error() string {
+	return "code : "+e.code+". "+e.description
 }
 
 /*
@@ -39,7 +47,7 @@ func Get(captcha, secretKey string) (res *Response, err error) {
 		return nil, err
 	}
 	verify := i.(map[string]interface{})
-	var errCodes string
+	var errCodes *ErrorCaptcha
 	var resp Response
 	res = &resp
 	for k, v := range verify {
@@ -59,19 +67,19 @@ func Get(captcha, secretKey string) (res *Response, err error) {
 		       for _, u := range vv {
 		            switch u {
 		            	case "missing-input-secret":
-		            		errCodes += " The secret parameter is missing."
+		            		errCodes = &ErrorCaptcha{"missing-input-secret", "The secret parameter is missing."}
 		            		
 		            	case "invalid-input-secret":
-		            		errCodes += " The secret parameter is invalid or malformed."
+		            		errCodes = &ErrorCaptcha{"invalid-input-secret", "The secret parameter is invalid or malformed."}
 		            		
 		            	case "missing-input-response":
-		            		errCodes += " The response parameter is missing."
+		            		errCodes = &ErrorCaptcha{"missing-input-response", "The response parameter is missing."} 
 		            	
 		            	case "invalid-input-response":
-		            		errCodes += " The response parameter is invalid or malformed."
+		            		errCodes = &ErrorCaptcha{"invalid-input-response", "The response parameter is invalid or malformed."}
 		            } 
 		        }
-		       err = errors.New(errCodes)
+		       err = errCodes
     	}
 	}
 	return res, err
