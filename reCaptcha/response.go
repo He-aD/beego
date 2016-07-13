@@ -29,14 +29,14 @@ func Get(captcha, secretKey string) (res *Response, err error) {
 	req.Param("response", captcha)
 	rJson, err := req.String()
 	if err != nil {
-	    
+	    return nil, err
 	}
 
 	var i interface{}
 	b := []byte(rJson)
 	err = json.Unmarshal(b, &i) //can't parse directly with the right struct because can contain attribute "error-code" "-" pb with golang attr
 	if err != nil {
-		
+		return nil, err
 	}
 	verify := i.(map[string]interface{})
 	var errCodes string
