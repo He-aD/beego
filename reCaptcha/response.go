@@ -3,6 +3,7 @@ package reCaptcha
 import (
 	"github.com/astaxie/beego/httplib"
 	"encoding/json"
+	"errors"
 )
 
 const NBERRORS = 4 //flag the number of google's error codes
@@ -20,8 +21,16 @@ type ErrorCaptcha struct {
 	description string
 }
 
-func (e *ErrorCaptcha) Error() string {
-	return "code : "+e.code+". "+e.description
+func (this *ErrorCaptcha) Error() string {
+	return "code : "+this.code+". "+this.description
+}
+
+func (this ErrorCaptcha) Code() string {
+	return this.code
+}
+
+func (this ErrorCaptcha) Description() string {
+	return this.description
 }
 
 /*
@@ -31,8 +40,11 @@ func (e *ErrorCaptcha) Error() string {
 	@captcha : js response
 	@secretKey : the necessary secret key send by google for the website	
 */
-func Get(captcha, secretKey string) (res *Response, err error) {
-	req := httplib.Post(APIURL)
+func Get(captcha, secretKey, apiURL string) (res *Response, err error) {
+	if apiURL == "" {
+		apiURL = APIURL
+	}
+	req := httplib.Post(apiURL)
 	req.Param("secret", secretKey)
 	req.Param("response", captcha)
 	rJson, err := req.String()
@@ -50,6 +62,7 @@ func Get(captcha, secretKey string) (res *Response, err error) {
 	var errCodes *ErrorCaptcha
 	var resp Response
 	res = &resp
+	
 	for k, v := range verify {
     	switch vv := v.(type) {
 	    	case string:
@@ -59,6 +72,9 @@ func Get(captcha, secretKey string) (res *Response, err error) {
 	        		
 	        		case "hostname":
 	        			res.Hostname = v.(string)
+	        			
+        			default: 
+	        			return nil, errors.New("google a renvoyé une value string non supportée.")
 	        	}
 	    	case bool:
 	    		res.Success = v.(bool)
@@ -77,9 +93,18 @@ func Get(captcha, secretKey string) (res *Response, err error) {
 		            	
 		            	case "invalid-input-response":
 		            		errCodes = &ErrorCaptcha{"invalid-input-response", "The response parameter is invalid or malformed."}
+	            		
+	            		default:		       
+		            		return nil, errors.New("google a retourné un code erreur non supporté : " + u.(string))
 		            } 
 		        }
 		       err = errCodes
+	       
+			case nil:
+				//do nothing in this case. errors can be null in json				      
+	       
+	       default:
+		       return nil, errors.New("google a retourné un type de value non supporté.")
     	}
 	}
 	return res, err
