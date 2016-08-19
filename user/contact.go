@@ -17,6 +17,30 @@ type Adresse struct {
 	adresse
 }
 
+func (this Adresse) Nom() string {
+	return this.adresse.Nom
+}
+
+func (this Adresse) Prenom() string {
+	return this.adresse.Prenom
+}
+
+func (this Adresse) NumeroRue() string {
+	return this.adresse.NumeroRue
+}
+
+func (this Adresse) Voie() string {
+	return this.adresse.Voie
+}
+
+func (this Adresse) CodePostal() string {
+	return this.adresse.CodePostal
+}
+
+func (this Adresse) Ville() string {
+	return this.adresse.Ville
+}
+
 func NewAdresse(no, p, nu, vo, c, vi string) (*Adresse) {
 	return &Adresse{adresse{no, p, nu, vo, c, vi}}
 }
@@ -38,6 +62,22 @@ type contact struct {
 
 type Contact struct {
 	contact
+}
+
+func (this Contact) Nom() string {
+	return this.contact.Nom
+}
+
+func (this Contact) Prenom() string {
+	return this.contact.Prenom
+}
+
+func (this Contact) Email() string {
+	return this.contact.Email
+}
+
+func (this Contact) Telephone() string {
+	return this.contact.Telephone
 }
 
 func NewContact(n, p, e, t string) (*Contact) {
