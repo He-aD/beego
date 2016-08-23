@@ -21,7 +21,7 @@ func NewServer(a string, po int, u, pa string) (*Server) {
 	return &Server{a, po, u, pa	}
 }
 
-func (this Server) Send(to, subj, body string) (error) {
+func (this Server) SendTLS(to, subj, body string) (error) {
 	var c *smtp.Client
 	var w io.WriteCloser
 	defer func () {
@@ -105,4 +105,18 @@ func (this Server) Send(to, subj, body string) (error) {
     }
     return err
 }
+
+func (this Server) Send(to, subj, body string) (error) {
+	// Set up authentication information.
+	auth := smtp.PlainAuth("", this.username, this.pass, this.address)
+
+	// Connect to the server, authenticate, set the sender and recipient,
+	// and send the email all in one step.
+	to2 := []string{to}
+	msg := []byte("To: " + to +  "\r\n" +
+		"Subject: " + subj + "\r\n" +
+		"\r\n" + body + "\r\n")
+	err := smtp.SendMail(this.address + ":" + strconv.Itoa(this.port), auth, this.username, to2, msg)
+	return err
+} 
 
