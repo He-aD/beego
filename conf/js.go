@@ -72,8 +72,13 @@ func ToJS() (err error) {
 	
 	for k, v := range arrConf {
 		for _, va := range sJs {
-			if strings.Replace(va, "#", "", -1) == k { //this key is authorized for conf.js file
-				content += "conf[\"" + k + "\"] = \"" + v + "\";\n"
+			sp := strings.Split(va, "/") 
+			if strings.Replace(sp[0], "#", "", -1) == k { //this key is authorized for conf.js file
+				if len(sp) < 2 {
+					content += "conf[\"" + k + "\"] = \"" + v + "\";\n"
+				} else { //if there is a slash the value has not to be initialized as a string
+					content += "conf[\"" + k + "\"] = " + v + ";\n"
+				}	
 			}
 		}
 		
