@@ -45,6 +45,7 @@ func Get(captcha, secretKey, apiURL string) (res *Response, err error) {
 		apiURL = APIURL
 	}
 	req := httplib.Post(apiURL)
+	req.Header("Connection", "close")
 	req.Param("secret", secretKey)
 	req.Param("response", captcha)
 	rJson, err := req.String()
